@@ -7,40 +7,31 @@ class Point:
     """
     Point a super simple struct that just contains a position at time t
     """
-    def __init__(self, position):
+    def __init__(self, position, null_point=False):
         """
         Pass in a dictionary to reference points on each dimension,
         ex. Point({'x':1, 'y':0, 'z':5})
-        Point.coordinates['x'] -> 1
+        Point.coords ['x'] -> 1
         OR pass in a list or tuple to reference the points as a1,a2,a3...
         ex. Point( (1, 0, 5) )
         Point.coordinates['a1'] -> 1
 
         """
 
-        self.coordinates = {}
-        if type(position) == tuple or type(position) == list:
+        self.coords = {}
+        if null_point:
+            self.null_point = True
+        elif type(position) == tuple or type(position) == list:
             n = 0
             for p in position:
-                self.coordinates['a'+str(n)] = p
+                self.coords['a'+str(n)] = p
                 n += 1
         elif type(position) == dict:
             for label,value in position.items():
-                self.coordinates[label] = value
+                self.coords[label] = value
 
+        self.null_point = False
 
-        #self.x = x
-        #self.y = y
-        #self.t = t
-"""
-        self.all_x = []
-        self.all_y = []
-        self.all_t = []
-        for p_i in self.p_set:
-            self.all_x.append(p_i.x)
-            self.all_y.append(p_i.y)
-            self.all_t.append(p_i.t)
-"""
 
 class Points:
     """
@@ -53,15 +44,12 @@ class Points:
 
         self.labels = []
         for p in self.p_set:
-            self.labels = p.coordinates.keys()
-
-        
-
-
+            self.labels = p.coords.keys()
     
+
     def all_line(self, label:str) -> list:
         """
-        Gets all the points in the line label.
+        Gets all the points on the labeled line.
         ex. all_line('x') gives a list of all the points on the x line
         """
 
@@ -69,14 +57,32 @@ class Points:
             return False
         line = []
         for p in self.p_set:
-            line.append(p.coordinates[label])
+            line.append(p.coords[label])
         return line
+
+    def all_pos(self, pos_label, value=None):
+        """
+        Gets all the other values of the points around a specific point.
+        For example, to get all the points at time = 0 will give something 
+        like all_pos({'t':0}) -> [Point({'x':0, 'y':1, 't':0}), Point({'x':-1, 'y':0, 't':0})]
+        """
+        if pos_label not in self.labels:
+            return False
+        at_p = list()
+        for p in self.p_set:
+            if pos_label in p.coords.keys():
+                if value != None and value in p.coords.values():
+                    at_p.append(p)
+                elif value == None:
+                    at_p.append(p)
+        return at_p
+
 
 
     def add_point(self, pt):
         self.p_set.append(pt)
         self.len = len(self.p_set)
-        for label in pt.coordinates.keys():
+        for label in pt.coords.keys():
             if label not in self.labels:
                 self.labels.append(label)
 
@@ -106,7 +112,7 @@ class Points:
 
     
 
-
+#Currently in the process of phasing this out to be reused
 class PolyReg:
     """
     PolyReg will initialize with a Points object and base its calculations

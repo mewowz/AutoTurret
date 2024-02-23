@@ -1,47 +1,46 @@
 from polyreg import Point, Points
 
 class Target:
-    self.pos = None
-    self.uid = None
-    self.max_pos = None
+    """
+    A struct-like object that stores Points with a reference
+    to a specific target. It's a way to give a set of points something
+    distinct about them.
+    """
 
     def __init__(self, uid, pos=None, max_pos=None):
-        if pos != None and type(pos) == Points:
+        if type(pos) == Points:
             self.pos = pos
-        elif pos == type(Point):
-            self.pos = Points([Point])
+        elif type(pos) == Point:
+            self.pos = Points([pos])
         else:
-            self.pos = Points([])
+            self.pos = Points()
 
         self.max_pos = max_pos
         self.uid = uid
-
-    def pop(self, index=0):
-        #removes and returns the first position pos[0] unless index is specified
-
-        if len(self.pos) != 0:
-            return self.pos.pop()
-        else:
-            return None
-
-    def append(self, position):
-        self.pos.append(position)
+    
 
 
 class Targets:
-    self.targets = {}
-    
-    def __init__(self, tar_list):
-        for t in tar_list:
+    """
+    Just a container with some helper functions for handling a set
+    of targets
+    """
+    def __init__(self, targets=None):
+        self.targets = {}
+        if targets == None:
+            return
+        for t in targets:
             self.targets[t.uid] = t
 
 
-    def add(self, tar):
+    def add(self, target):
         if tar.uid not in self.targets.keys():
-            self.targets_l[tar.uid] = tar
+            self.targets[tar.uid] = target
+        else:
+            return False
     
     def remove(self, uid):
-        if tar.uid in self.targets.keys():
+        if uid in self.targets.keys():
             del self.targets[uid]
 
 
